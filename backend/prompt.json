@@ -1,0 +1,17 @@
+ prompt = {
+      
+         "Main Topic": "What is the central theme of the video? Describe the core concept or idea being discussed in detail. How does this idea fit into the broader context of the field or subject matter?",
+         "Key Points": "Identify the major points covered in the video, emphasizing the most crucial sections. What are the key arguments or perspectives presented? How are these points explained and supported throughout?",
+         "Resources Mentioned": "List and explain any resources, websites, links, or tools mentioned in the video. Provide full details about each, including their purpose, how they are used, and any key benefits they offer to the viewer.",
+         "Tools, Techniques, or Best Practices": "Dive into the tools, techniques, and best practices discussed in the video. For each, explain their functions in depth, how they are applied in real-world situations, and why they are considered valuable in the context of the video’s main topic.",
+         "Recommendations and Tips": "What actionable advice and practical tips does the video provide? Include suggestions on how to implement these tips, who they are most relevant for, and the impact they can have if applied correctly.",
+         "Security & Performance Considerations": "Does the video address any security concerns or performance optimization strategies? If so, describe the specific considerations presented. How should viewers approach potential risks, and what are the best practices for maintaining security and performance?",
+         "Real-World Applications": "Are real-world applications, case studies, or examples shared in the video? Explain how the discussed concepts have been applied in practical scenarios. What real-life challenges are addressed, and how were they overcome using the tools and techniques shared?",
+         "Challenges or Pitfalls": "What challenges or common mistakes does the video highlight? How can these be avoided, and what steps should viewers take to ensure success when applying the video’s concepts?",
+         "Actionable Steps": "Provide a list of actionable steps that the viewer can take based on the video's content. How can they directly apply the insights from the video to improve their own practice or projects? What specific actions should be prioritized?",
+         "Summary of Tools or Services": "Offer a detailed summary of all the tools, services, or platforms mentioned in the video. How does each one serve the viewer’s needs? What are the unique selling points of these tools or services, and how can they be leveraged most effectively?",
+         "Final Thoughts or Conclusion": "What is the overarching message or conclusion the video conveys? How should viewers reflect on the information shared, and what are the final takeaways that they should keep in mind moving forward?",
+         "Word Limit": "Please ensure the summary is comprehensive yet concise, falling within a 1500-word range, neither too short nor too long. Make sure each section is addressed thoroughly with clear explanations, avoiding unnecessary repetition.",
+         "Summary Request": "Please provide a comprehensive summary of the YouTube video, focusing on the main topic, key points, important timestamps, key takeaways, any important data or quotes, and actionable items. Also, include the video title, creator/channel, video length, and publication date. Provide an executive summary, a detailed breakdown, critical analysis, practical applications, and key points to remember."
+            
+     }

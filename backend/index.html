@@ -1,0 +1,649 @@
+<!-- public/home-page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Qmma AI</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons CDN -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <!-- تضمين خط IBM Plex Sans من Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <!-- CSS مخصص للأنماط والرسوم المتحركة -->
+  <style>
+    /* Keyframes للرسوم المتحركة */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    /* فئات الرسوم المتحركة */
+    .animate-fade-in-up {
+      animation: fadeInUp 0.8s forwards;
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.8s forwards;
+    }
+    .animate-delay-1 {
+      animation-delay: 0.4s;
+    }
+    .animate-delay-2 {
+      animation-delay: 0.6s;
+    }
+    .animate-delay-3 {
+      animation-delay: 1s;
+    }
+    .animate-delay-4 {
+      animation-delay: 1.5s;
+    }
+    .animate-delay-5 {
+      animation-delay: 1.8s;
+    }
+    .animate-delay-6 {
+      animation-delay: 2s;
+    }
+    .animate-delay-7 {
+      animation-delay: 2.2s;
+    }
+    /* أنماط الزر */
+    #synthesizeNow {
+      width: 0;
+      opacity: 0;
+      display: inline-block;
+      overflow: hidden;
+      transition: width 0.3s ease, opacity 0.3s ease;
+      white-space: nowrap;
+    }
+    #synthesizeButton:hover #synthesizeNow {
+      width: auto;
+      opacity: 1;
+    }
+    /* أنماط واجهة الشات */
+    #chatContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+    }
+    #chatContainer.active {
+      display: flex;
+    }
+    /* مؤشر التحميل */
+    .loader {
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    /* صندوق الإدخال في الأسفل */
+    #chatInputContainer {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 30;
+    }
+    #chatInputContainer.active {
+      display: block;
+    }
+    /* رسائل الشات */
+    #chatMessages {
+      max-width: 800px;
+      width: 100%;
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      margin-bottom: 80px;
+      display: flex;
+      flex-direction: column;
+    }
+    /* مشغل الفيديو */
+    #videoPlayer {
+      width: 100%;
+      max-width: 800px;
+      aspect-ratio: 16 / 9;
+      background-color: #000;
+      margin-top: 1rem;
+    }
+    /* ضمان توسيط المحتوى الرئيسي */
+    #mainContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 7rem;
+    }
+    /* ضبط حاوية الشات لمنع التداخل مع الإدخال */
+    #chatContentWrapper {
+      max-width: 800px;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    /* أيقونة على شاشة الشات */
+    #chatIcon {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      cursor: pointer;
+      z-index: 20;
+    }
+    /* أنماط الرسائل */
+    .message {
+      max-width: 80%;
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
+    .message.user {
+      align-self: flex-end;
+      background-color: #1D4ED8;
+      color: white;
+    }
+    .message.bot {
+      align-self: flex-start;
+      background-color: #374151;
+      color: white;
+    }
+    /* أنماط الشريط الجانبي */
+    #sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 16rem;
+      background-color: rgba(17, 24, 39, 0.9);
+      backdrop-filter: blur(10px);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 40;
+    }
+    #sidebar.active {
+      transform: translateX(0);
+    }
+    #sidebar ul {
+      margin-top: 5rem;
+    }
+    #sidebar li {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      color: white;
+      cursor: pointer;
+    }
+    #sidebar li:hover {
+      background-color: #1F2937;
+    }
+    #sidebar li i {
+      margin-right: 0.75rem;
+    }
+    /* أنماط أيقونة إغلاق الشريط الجانبي */
+    #closeSidebarIcon {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16rem;
+      cursor: pointer;
+      z-index: 30;
+      transition: left 0.3s ease-in-out;
+    }
+    #sidebar.active + #closeSidebarIcon {
+      display: block;
+      left: 16rem;
+    }
+    #sidebar:not(.active) + #closeSidebarIcon {
+      left: 0;
+    }
+    /* ضبط الخط إلى IBM Plex Sans */
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-black text-white overflow-auto relative">
+  <!-- خلفية Canvas -->
+  <canvas id="backgroundCanvas" class="absolute inset-0 z-0"></canvas>
+
+  <!-- الشريط الجانبي -->
+  <div id="sidebar">
+    <ul class="mt-20">
+      <li onclick="goBack()">
+        <i data-feather="home"></i>
+        Home
+      </li>
+      <li>
+        <i data-feather="mail"></i>
+        Contact
+      </li>
+      <li>
+        <i data-feather="dollar-sign"></i>
+        Pricing
+      </li>
+    </ul>
+  </div>
+
+  <!-- أيقونة إغلاق الشريط الجانبي -->
+  <div id="closeSidebarIcon" class="text-gray-400 hover:text-white transition" onclick="toggleSidebar()">
+    <i data-feather="x" class="h-8 w-8"></i>
+  </div>
+
+  <!-- المحتوى الرئيسي -->
+  <div id="mainContent" class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
+    <!-- العنوان -->
+    <h1 class="text-6xl font-bold mb-4 text-center animate-fade-in-up">
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500">
+        Qmma AI Summarize YouTube Video
+      </span>
+    </h1>
+    <!-- العنوان الفرعي -->
+    <p class="text-xl text-gray-400 mb-12 text-center max-w-2xl animate-fade-in animate-delay-1">
+      Harness the power of Qmma AI to distill video content into concise, intelligent summaries.
+    </p>
+    <!-- النموذج -->
+    <div class="w-full max-w-3xl animate-fade-in animate-delay-2">
+      <form onsubmit="handleSubmit(event)" class="relative">
+        <input
+          type="url"
+          placeholder="Enter YouTube URL"
+          id="urlInput"
+          class="w-full bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-lg border-2 border-gray-700 rounded-full py-6 px-8 pr-36 text-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
+          required
+        />
+        <button
+          type="submit"
+          class="absolute right-2 top-2 bottom-2 bg-white text-black rounded-full px-8 py-4 font-semibold hover:bg-gray-200 transition duration-300 shadow-lg hover:shadow-xl flex items-center"
+          id="synthesizeButton"
+        >
+          <i data-feather="zap" class="mr-2 h-5 w-5"></i>
+          SUMMARIZE
+          <!-- <span id="synthesizeNow" class="ml-2 overflow-hidden whitespace-nowrap">Now</span> -->
+        </button>
+      </form>
+    </div>
+    <!-- بطاقات الميزات -->
+    <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl animate-fade-in-up animate-delay-3">
+      <!-- بطاقة الميزة 1 -->
+      <div class="bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-lg p-6 rounded-2xl border border-gray-800">
+        <i data-feather="zap" class="h-12 w-12 text-white mb-4"></i>
+        <h3 class="text-2xl font-semibold mb-2">Instant Summaries</h3>
+        <p class="text-gray-400">Get quick and accurate summaries of any YouTube video in seconds.</p>
+      </div>
+      <!-- بطاقة الميزة 2 -->
+      <div class="bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-lg p-6 rounded-2xl border border-gray-800">
+        <i data-feather="sliders" class="h-12 w-12 text-white mb-4"></i>
+        <h3 class="text-2xl font-semibold mb-2">Customizable Insights</h3>
+        <p class="text-gray-400">Tailor the depth and focus of summaries to suit your needs.</p>
+      </div>
+      <!-- بطاقة الميزة 3 -->
+      <div class="bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-lg p-6 rounded-2xl border border-gray-800">
+        <i data-feather="message-circle" class="h-12 w-12 text-white mb-4"></i>
+        <h3 class="text-2xl font-semibold mb-2">Interactive Q&A</h3>
+        <p class="text-gray-400">Engage with the content through an AI-powered chat interface.</p>
+      </div>
+    </div>
+    <!-- معاينة الفيديو -->
+    <div class="mt-20 animate-fade-in animate-delay-4">
+      <img src="https://media.licdn.com/dms/image/v2/D5612AQH4ngr2nDdAcw/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1694413867184?e=2147483647&v=beta&t=k1aN5F5fe3zaJgacnmhw3vwvEgsf5voawX48Z1csnsw" alt="Video Preview" class="rounded-2xl shadow-xl max-w-full h-auto">
+    </div>
+    <!-- قسم المحتوى -->
+    <div class="mt-20 w-full max-w-6xl animate-fade-in-up animate-delay-5">
+      <h2 class="text-4xl font-semibold mb-6 text-center">Why Choose Qmma AI?</h2>
+      <p class="text-xl text-gray-400 text-center">Experience the future of video summarization with cutting-edge AI technology.</p>
+    </div>
+    <!-- تقنية Quantum AI -->
+    <div class="mt-16 w-full max-w-4xl animate-fade-in animate-delay-6">
+      <h2 class="text-3xl font-semibold mb-4">Powered by Quantum AI</h2>
+      <p class="text-gray-400">Our platform leverages quantum computing principles to deliver unmatched speed and accuracy in content summarization.</p>
+    </div>
+    <!-- استكشف المزيد من الميزات -->
+    <div class="mt-12 text-center animate-fade-in-up animate-delay-7">
+      <a href="#" class="text-lg font-semibold text-white underline hover:text-gray-300">Explore More Features</a>
+    </div>
+  </div>
+
+  <!-- واجهة الشات -->
+  <div id="chatContainer" class="relative z-10 flex flex-col items-center min-h-screen p-4">
+    <!-- أيقونة على شاشة الشات -->
+    <div id="chatIcon" class="text-gray-400 hover:text-white transition" onclick="toggleSidebar()">
+      <i data-feather="menu" class="h-8 w-8"></i>
+    </div>
+    <!-- مشغل الفيديو -->
+    <div id="videoPlayer" class="mt-12">
+      <!-- سيتم تضمين الفيديو هنا -->
+      <iframe id="videoIframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <!-- محتوى الشات -->
+    <div id="chatContentWrapper" class="w-full flex-1">
+      <!-- رسائل الشات -->
+      <div id="chatMessages" class="bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-lg rounded-3xl border border-gray-800 mt-4 flex-1 overflow-y-auto">
+        <!-- مؤشر التحميل -->
+        <div id="loadingIndicator" class="flex justify-center items-center h-64">
+          <div class="loader"></div>
+        </div>
+        <!-- سيتم إضافة الرسائل هنا -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- حقل الإدخال في الأسفل -->
+  <div id="chatInputContainer">
+    <form onsubmit="handleUserInput(event)" class="relative max-w-3xl mx-auto">
+      <input
+        type="text"
+        placeholder="Ask a question about the video..."
+        id="userInput"
+        class="w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg border-2 border-gray-700 rounded-full py-4 px-6 text-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
+        required
+      />
+      <button
+        type="submit"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white text-black rounded-full px-4 py-2 font-semibold hover:bg-gray-200 transition duration-300 shadow-lg hover:shadow-xl flex items-center"
+      >
+        <i data-feather="send" class="h-5 w-5"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- السكربتات -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    // تهيئة Feather Icons
+    document.addEventListener('DOMContentLoaded', function() {
+      feather.replace();
+    });
+
+    // سكربت حركة الجسيمات
+    (function() {
+      const canvas = document.getElementById('backgroundCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particles = [];
+      const particleCount = 100;
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 0.1;
+          this.speedX = Math.random() * 3 - 1.5;
+          this.speedY = Math.random() * 3 - 1.5;
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          if (this.x > canvas.width) this.x = 0;
+          else if (this.x < 0) this.x = canvas.width;
+          if (this.y > canvas.height) this.y = 0;
+          else if (this.y < 0) this.y = canvas.height;
+        }
+
+        draw() {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(particle => {
+          particle.update();
+          particle.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+
+      initParticles();
+      animate();
+
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initParticles();
+      });
+    })();
+
+    // استخراج ID فيديو يوتيوب من الرابط
+    function extractYouTubeVideoID(url) {
+      const regex = /(?:v=|\/)([0-9A-Za-z_-]{11}).*/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    // التعامل مع إرسال النموذج
+    function handleSubmit(e) {
+      e.preventDefault();
+      const url = document.getElementById('urlInput').value;
+      if (!url) return;
+
+      // إخفاء المحتوى الرئيسي وإظهار واجهة الشات
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('chatContainer').classList.add('active');
+      document.getElementById('chatInputContainer').classList.add('active');
+
+      // ضبط رابط الفيديو في iframe
+      const videoId = extractYouTubeVideoID(url);
+      if (videoId) {
+        document.getElementById('videoIframe').src = `https://www.youtube.com/embed/${videoId}`;
+
+        // جلب النص
+        fetchTranscript(videoId);
+      } else {
+        addBotMessage('Invalid YouTube URL.');
+      }
+
+      // إظهار حقل رسائل الشات
+      document.getElementById('loadingIndicator').style.display = 'flex';
+
+      // تركيز على حقل الإدخال
+      setTimeout(() => {
+        document.getElementById('userInput').focus();
+      }, 500);
+    }
+
+    // تعديل عناوين fetch لتشير إلى الخادم الخلفي
+    const SERVER_URL = ''; // تأكد من تغيير المنفذ إذا كنت تستخدم منفذًا مختلفًا
+
+    // جلب النص من الخلفية
+    async function fetchTranscript(videoId) {
+      try {
+        const response = await fetch(`/get_transcript`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ video_id: videoId })
+        });
+
+        const data = await response.json();
+        if (data.transcript) {
+          displayTranscript(data.transcript);
+          // إرسال إلى ChatGPT
+          fetchSummary(data.transcript);
+        } else {
+          addBotMessage(`Error fetching transcript: ${data.error}`);
+        }
+      } catch (error) {
+        addBotMessage(`An error occurred: ${error.message}`);
+      }
+    }
+
+    function displayTranscript(transcript) {
+      addBotMessage(`<strong>Transcript:</strong><br>${sanitizeHTML(transcript)}`);
+      // إخفاء مؤشر التحميل بعد عرض النص
+      document.getElementById('loadingIndicator').style.display = 'none';
+    }
+
+    // جلب الملخص من الخلفية
+    async function fetchSummary(transcript) {
+      try {
+        addBotMessage('Summarizing the transcript...');
+        const response = await fetch(`${SERVER_URL}/summarize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript: transcript })
+        });
+
+        const data = await response.json();
+        if (data.summary) {
+          addBotMessage(`<strong>Summary:</strong><br>${sanitizeHTML(data.summary)}`);
+        } else {
+          addBotMessage(`Error summarizing transcript: ${data.error}`);
+        }
+      } catch (error) {
+        addBotMessage(`An error occurred: ${error.message}`);
+      }
+    }
+
+    // التعامل مع إدخال المستخدم في الشات
+    function handleUserInput(e) {
+      e.preventDefault();
+      const userInput = document.getElementById('userInput').value.trim();
+      if (!userInput) return;
+
+      // عرض سؤال المستخدم
+      addUserMessage(userInput);
+
+      // مسح حقل الإدخال
+      document.getElementById('userInput').value = '';
+
+      // التمرير إلى الأسفل
+      scrollToBottom();
+
+      // إرسال سؤال المستخدم إلى الخلفية
+      fetchChatResponse(userInput);
+    }
+
+    // جلب استجابة الشات من الخلفية
+    async function fetchChatResponse(userInput) {
+      try {
+        const response = await fetch(`${SERVER_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: userInput })
+        });
+
+        const data = await response.json();
+        if (data.answer) {
+          addBotMessage(`<strong>Response:</strong><br>${sanitizeHTML(data.answer)}`);
+        } else {
+          addBotMessage(`Error fetching response: ${data.error}`);
+        }
+        scrollToBottom();
+      } catch (error) {
+        addBotMessage(`An error occurred: ${error.message}`);
+        scrollToBottom();
+      }
+    }
+
+    // إضافة رسالة المستخدم
+    function addUserMessage(message) {
+      const chatMessages = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', 'user');
+      messageDiv.innerHTML = sanitizeHTML(message);
+      chatMessages.appendChild(messageDiv);
+    }
+
+    // إضافة رسالة البوت
+    function addBotMessage(message) {
+      const chatMessages = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', 'bot');
+      messageDiv.innerHTML = message;
+      chatMessages.appendChild(messageDiv);
+      scrollToBottom();
+    }
+
+    // التمرير إلى الأسفل في الشات
+    function scrollToBottom() {
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // العودة إلى المحتوى الرئيسي
+    function goBack() {
+      // إيقاف الفيديو
+      document.getElementById('videoIframe').src = '';
+      // إعادة ضبط محتوى الشات
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '<div id="loadingIndicator" class="flex justify-center items-center h-64"><div class="loader"></div></div>';
+      // إخفاء واجهة الشات وإظهار المحتوى الرئيسي
+      document.getElementById('chatContainer').classList.remove('active');
+      document.getElementById('mainContent').style.display = 'flex';
+      document.getElementById('chatInputContainer').classList.remove('active');
+
+      // إغلاق الشريط الجانبي إذا كان مفتوحًا
+      closeSidebar();
+    }
+
+    // دالة لتعقيم إدخال المستخدم لمنع هجمات XSS
+    function sanitizeHTML(str) {
+      const temp = document.createElement('div');
+      temp.textContent = str;
+      return temp.innerHTML;
+    }
+
+    // وظائف الشريط الجانبي
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+
+      // تحديث أيقونات Feather
+      feather.replace();
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.remove('active');
+    }
+
+    // إغلاق الشريط الجانبي عند النقر على أي عنصر
+    document.querySelectorAll('#sidebar li').forEach(item => {
+      item.addEventListener('click', () => {
+        closeSidebar();
+      });
+    });
+  </script>
+</body>
+</html>
