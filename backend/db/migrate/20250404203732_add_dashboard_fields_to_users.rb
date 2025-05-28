@@ -32,7 +32,7 @@ class AddDashboardFieldsToUsers < ActiveRecord::Migration[7.2]
     add_column :users, :products_added_to_cart, :integer
     add_column :users, :checkout_started, :boolean
     add_column :users, :purchase_completed, :boolean
-    add_column :users, :order_value, :decimal
+    add_column :users, :order_value, :decimal, precision: 10, scale: 2
     add_column :users, :payment_method, :string
     add_column :users, :coupon_used, :string
     add_column :users, :city, :string
@@ -41,6 +41,7 @@ class AddDashboardFieldsToUsers < ActiveRecord::Migration[7.2]
     add_column :users, :isp, :string
     add_column :users, :latitude, :float
     add_column :users, :longitude, :float
-    add_column :users, :additional_data, :jsonb
+    # استخدام :text بدلاً من :jsonb لأن SQLite لا يدعم JSONB
+    add_column :users, :additional_data, :text
   end
 end
