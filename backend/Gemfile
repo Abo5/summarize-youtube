@@ -1,7 +1,6 @@
 source "https://rubygems.org"
 
 gem "rails", "~> 7.2.2", ">= 7.2.2.1"
-gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
@@ -18,5 +17,11 @@ end
 gem 'httparty'
 gem 'rexml' # Added REXML gem
 gem "securerandom", "~> 0.4.0"
-gem "typhoeus"
+# gem "typhoeus"
 gem 'rack-cors'
+gem "sqlite3"
+# في Gemfile، أضف شرط للنظام
+# gem 'curb', platforms: [:ruby] unless Gem.win_platform?
+# gem 'curb'
+# gem 'typhoeus' 
+# gem 'yt-dlp'
