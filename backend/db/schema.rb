@@ -11,9 +11,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.2].define(version: 2025_04_04_203732) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
   create_table "users", force: :cascade do |t|
     t.string "visitor_id", null: false
     t.string "ip"
@@ -54,7 +51,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_04_04_203732) do
     t.integer "products_added_to_cart"
     t.boolean "checkout_started"
     t.boolean "purchase_completed"
-    t.decimal "order_value"
+    t.decimal "order_value", precision: 10, scale: 2
     t.string "payment_method"
     t.string "coupon_used"
     t.string "city"
@@ -63,7 +60,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_04_04_203732) do
     t.string "isp"
     t.float "latitude"
     t.float "longitude"
-    t.jsonb "additional_data"
+    t.text "additional_data"
     t.index ["cookie_token"], name: "index_users_on_cookie_token"
     t.index ["visitor_id"], name: "index_users_on_visitor_id", unique: true
   end
